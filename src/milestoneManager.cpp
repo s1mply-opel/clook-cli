@@ -47,7 +47,12 @@ void MilestoneManager::handleMainCommand(const std::string& cmd) {
             std::cout << "No milestones yet, Start a new one!" << std::endl;
         } else {
             for (size_t i = 0; i < milestones.size(); i++){
-                std::cout << i + 1 << ". " << milestones[i]->getName() << ": " << milestones[i]->getDescription() << std::endl;
+                std::cout << i + 1 << ". " << milestones[i]->getName();
+                if(milestones[i]->getDescription().empty()) {
+                    std::cout << std::endl;
+                } else {
+                    std::cout << ": " << milestones[i]->getDescription() << std::endl;
+                }
             }
         }
 
@@ -56,11 +61,16 @@ void MilestoneManager::handleMainCommand(const std::string& cmd) {
         iss >> index;
         index--;
 
+        if (milestones.empty()) {
+            std::cout << "Milestones is empty." << std::endl;
+        }
+
         if (index < milestones.size() && index >= 0) {
             try {
                 // ? What if can't erase?
+                auto name = milestones[index]->getName();
                 milestones.erase(milestones.begin() + index);
-                std::cout << "Deleted milestone: " << milestones[index]->getName() << std::endl;
+                std::cout << "Deleted milestone: " << name << std::endl;
             } catch (const Clook::exceptions::ProjectError& e) {
                 std::cerr << e.what() << std::endl;
             }
@@ -83,7 +93,8 @@ void MilestoneManager::handleMainCommand(const std::string& cmd) {
             Milestone& m = *milestones[selected];
             std::string subcmd;
 
-            showMilestoneMenu(m); std::cout << "--> ";
+            // showMilestoneMenu(m); 
+            std::cout << "--> ";
             while (true) {
                 std::getline(std::cin , subcmd);
                 if (subcmd == "back") break;
@@ -134,6 +145,8 @@ void MilestoneManager::handleMilestoneCommand(Milestone& m, const std::string& c
         int duration; iss >> duration;
         m.setSessionDuration(duration);
         std::cout << "Loop duration has been set to " << duration << " minutes." << std::endl;
+    } else if (action == "help") {
+        showMilestoneMenu(m);
     }
     
     else {
@@ -144,7 +157,8 @@ void MilestoneManager::handleMilestoneCommand(Milestone& m, const std::string& c
 
 
 void MilestoneManager::run() {
-    showMainMenu(); std::cout << ">>> ";
+    // showMainMenu(); 
+    std::cout << ">>> ";
     running = true;
     while (running) {
         std::string cmd;

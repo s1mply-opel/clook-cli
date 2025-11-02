@@ -24,6 +24,6 @@ int main() {
     MilestoneManager::MilestoneManagerData newData = mm.serialize();
     saveMilestoneManager(newData, SAVE_FILE_PATH.string());
 
-    std::cout << "Saved to " << SAVE_FILE_PATH << std::endl;
+    // std::cout << "Saved to " << SAVE_FILE_PATH << std::endl;
     return 0;
 }
