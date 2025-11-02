@@ -77,10 +77,6 @@ A potential improvement is a statistics feature that provides insight into produ
 * Loop completion rates
 * Session efficiency trends
 
-## License
-
-MIT (or specify)
-
 ## Author
 
-Owen
+Owen Elizmartin
