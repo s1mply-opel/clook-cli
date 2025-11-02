@@ -7,8 +7,16 @@
 #include <iomanip>
 #include <cstring>
 
+<<<<<<< HEAD
 #define GREEN "\033[32m"
 #define RED "\033[31m"
+=======
+#define BLUE "\033[34m"
+#define YELLOW "\033[33m"
+#define GREEN "\033[32m"
+#define RED "\033[31m"
+#define GREY "\033[30m"
+>>>>>>> dev
 #define RESET "\033[0m"
 
 // --- Test representation ---
@@ -50,6 +58,7 @@ inline std::string extractSuiteName(const char* filePath) {
     }();                                                                            \
     bool testName()
 
+<<<<<<< HEAD
 #define TEST(cond, msg, failedPtr)                                                  \
     do {                                                                            \
         if (!(cond)) {                                                              \
@@ -58,6 +67,19 @@ inline std::string extractSuiteName(const char* filePath) {
         }                                                                           \
         else {                                                                      \
             std::cout << "\t" << GREEN << "[PASS] " << RESET << std::endl;          \
+=======
+#define TEST(targ, cond, msg, failedPtr)                                            \
+    do {                                                                            \
+        constexpr int WIDTH = 30;                                                   \
+        if (!(cond)) {                                                              \
+            std::cout << GREY << "\t-" << std::left << std::setw(WIDTH) << targ << RESET;           \
+            std::cout << RED << " [FAIL] " << RESET << msg << std::endl;            \
+            (*failedPtr)++;                                                         \
+        }                                                                           \
+        else {                                                                      \
+            std::cout << "\t-" << std::left << std::setw(WIDTH) << targ;            \
+            std::cout << GREEN << " [PASS]" << RESET << std::left << std::endl;     \
+>>>>>>> dev
         }                                                                           \
     } while (0)
 
