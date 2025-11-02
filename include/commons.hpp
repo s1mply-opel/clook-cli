@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-#include <iostream>
-#include <vector>
-#include <cassert>
-=======
 #pragma once
 #include <iostream>
 #include <vector>
@@ -47,4 +42,3 @@ inline void ensureSaveFolderExists() {
 
 
 constexpr int SESSION_DURATION = 45; //in minutes;
->>>>>>> dev

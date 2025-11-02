@@ -1,13 +1,5 @@
 #pragma once
 #include "commons.hpp"
-<<<<<<< HEAD
-
-class Milestone {
-    public:
-
-    private:
-        
-=======
 #include "attempt.hpp"
 #include "timer.hpp"
 #include "exceptions.hpp"
@@ -55,5 +47,4 @@ private:
     std::unique_ptr<Timer> timer;
     Attempt* activeAttempt{nullptr};
     int loopDuration {0};
->>>>>>> dev
 };
