@@ -81,3 +81,7 @@ bool Timer::isRunning() const noexcept {
 bool Timer::isPaused() const noexcept {
     return paused;
 }
+
+Timer::Duration Timer::getRemainingDuration() {
+    return (duration - elapsed);
+}

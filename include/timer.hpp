@@ -25,6 +25,8 @@ public:
     bool isRunning() const noexcept;
     bool isPaused() const noexcept;
 
+    Duration getRemainingDuration();
+
 private:
     std::atomic<bool> running{false};
     std::atomic<bool> paused{false};

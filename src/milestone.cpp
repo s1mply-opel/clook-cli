@@ -16,6 +16,17 @@ void Milestone::setSessionDuration(int minutes) {
     // timer->setDuration(minutes * 60); 
 }
 
+void Milestone::deleteAttempt(int index) {
+    index--;
+    if (index < attempts.size()) {
+        auto name = attempts[index].get()->getName();
+        attempts.erase(attempts.begin() + index);
+        std::cout << "Removed: " << name << std::endl;
+    } else {
+        std::cout << "Invalid index" << std::endl;
+    } 
+}
+
 Attempt& Milestone::createAttempt(std::string n, std::string desc,int t) {
     auto attempt = std::make_unique<Attempt>(n, desc, t);
     attempts.push_back(std::move(attempt));
@@ -28,19 +39,20 @@ void Milestone::listAttempts() {
         return;
     }
 
-    std::cout << "Attempts: " << std::endl;
+    std::cout << "Attempts" << std::endl;
     for (size_t i = 0;i < attempts.size(); i++) {
-        std::cout << i + 1 << ". " << attempts[i].get()->getName() << std::endl;
+        std::cout << "  " << i + 1 << ". " << attempts[i].get()->getName() << " - " << attempts[i].get()->getDescription() << " -- "<< attempts[i].get()->getCurrent() << " / " << attempts[i].get()->getTarget() << std::endl;
     }
 }
 
 void Milestone::selectAttempt(int index) {
     index--;
     if (index < attempts.size()) {
+        selected = index;
         activeAttempt = attempts[index].get();
         std::cout << "Selected: " << activeAttempt->getName() << std::endl;
     } else {
-        std::cout << "Invalid index" << std::endl;
+        std::cout << "Invalid index This?" << std::endl;
     }
 }
 
@@ -62,8 +74,8 @@ void Milestone::startAttempt(){
         if(activeAttempt) {
             activeAttempt->incCount();
             //Optional: logs or notification for user
-            std::cout << "Attempt: " << activeAttempt->getCurrent() << "/" << activeAttempt->getTarget() << std::endl;
-            std::cout << "--> ";
+            std::cout << "Attempt: " << activeAttempt->getCurrent() << "/" << activeAttempt->getTarget() << "\n"
+                      << "[Attempt: " << activeAttempt->getName() << "2] >";
         }
     });
     // Start timer
@@ -84,13 +96,23 @@ void Milestone::stopAttempt() {
     activeAttempt = nullptr;
 }
 
-void Milestone::pauseAttempt() { timer->pause(); }
-void Milestone::resumeAttempt() { timer->resume(); }
-
-// Might need to redo
-// void Milestone::addNote(const std::string& text){
-//     notes.emplace_back(text);
-// }
+void Milestone::pauseAttempt() { 
+    timer->pause(); 
+    if(timer->isPaused()) {
+        std::cout << "Timer is paused." << std::endl;
+    }
+}
+void Milestone::resumeAttempt() { 
+    if(!timer->isRunning()) {
+        timer->resume(); 
+        std::cout << "Timer has resumed." << std::endl;
+        //Todo
+        // timer->getRemainingDuration();
+    } else {
+        std::cout << "Timer is already running." << std::endl;
+    }
+    
+}
 
 Milestone::MilestoneData Milestone::serialize() const {
     MilestoneData data;
@@ -102,14 +124,7 @@ Milestone::MilestoneData Milestone::serialize() const {
         data.attempts.push_back(attempt->serialize());
     }
 
-    data.activeAttemptIndex = -1;
-    // store index of active attempt, or -1 if none
-    if (activeAttempt) {
-        auto it = std::find_if(attempts.begin(), attempts.end(),
-                               [this](const std::unique_ptr<Attempt>& ptr) { return ptr.get() == activeAttempt; });
-        data.activeAttemptIndex = (it != attempts.end()) ? std::distance(attempts.begin(), it) : -1;
-    }
-
+    data.activeAttemptIndex = selected;
     return data;
 }
 
@@ -121,9 +136,10 @@ Milestone Milestone::fromData(const MilestoneData& data) {
         m.attempts.push_back(std::make_unique<Attempt>(std::move(a)));
     }
 
-    if(data.activeAttemptIndex >= 0) {
-        m.selectAttempt(data.activeAttemptIndex);
-    }
+    m.selected = data.activeAttemptIndex;
+    if (m.selected < m.attempts.size()) m.activeAttempt = m.attempts[m.selected].get();
+    else                                m.activeAttempt = nullptr;
+
     m.setSessionDuration(data.loopDuration);
 
     return m;

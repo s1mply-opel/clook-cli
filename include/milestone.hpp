@@ -23,6 +23,7 @@ public:
     void listAttempts();
 
     void selectAttempt(int index);
+    void deleteAttempt(int index);
     void startAttempt();
     void pauseAttempt();
     void resumeAttempt();
@@ -36,6 +37,16 @@ public:
     const std::string& getDescription() const noexcept { return description; }
     const int getDuration() const noexcept { return loopDuration; }
 
+    const std::string getAttemptName() const noexcept {
+        if (selected < attempts.size()) {
+            return attempts[selected].get()->getName();
+        } else {
+            return std::string("NULL");
+        }
+    }
+
+    const bool isAttemptSelected() const noexcept { return (selected < attempts.size()); }
+
     MilestoneData serialize() const;
     static Milestone fromData(const MilestoneData&);
     
@@ -43,8 +54,9 @@ private:
     std::string name;
     std::string description;
     std::vector<std::unique_ptr<Attempt>> attempts;
-    // std::vector<std::unique_ptr<Notes>> notes;
-    std::unique_ptr<Timer> timer;
-    Attempt* activeAttempt{nullptr};
+    size_t selected{0};
     int loopDuration {0};
+
+    Attempt* activeAttempt{nullptr};
+    std::unique_ptr<Timer> timer;
 };

@@ -9,6 +9,7 @@ void MilestoneManager::showMainMenu() const {
               << "  select <index>        - Manage milestone\n"
               << "  enter                 - Enter milestone\n"
               << "  help                  - Show commands\n"
+              << "  clear                 - Clear screen\n"
               << "  quit | exit           - Exit program\n";
 }
 
@@ -18,18 +19,56 @@ void MilestoneManager::showMilestoneMenu(Milestone& m) const {
               << "  info                  - Show milestone details\n"
               << "  add <name> <desc> <t> - Add a new attempt\n"
               << "  list                  - List all attempts\n"
-              << "  start                 - Start the attempt\n"
+              << "  enter                 - Enter attempt menu\n"
+              << "  delete <index>        - Delete attempt by index\n"
               << "  select <index>        - Select and manage a specific attempt\n"
               << "  set <minutes>         - Set duration time per loop\n"
               << "  help                  - Show commands\n"
               << "  back                  - Return to main menu\n";
 }
 
+void MilestoneManager::showAttemptMenu() const {
+    std::cout << "=== Attempt ===\n";
+    std::cout << "Commands:\n"
+              << " start                     - Start attempt\n"
+              << " pause                     - Pause attempt\n"
+              << " resume                    - Resume attempt\n"
+              << " stop                      - Stop attempt\n"
+              << " back                      - Return to milestone menu\n"
+              << " help                      - Show all commands\n";
+}
+
+
+void MilestoneManager::run() {
+    std::cout << "[Clook] > ";
+    running = true;
+    while (running) {
+        std::string cmd;
+        if(!std::getline(std::cin, cmd)) {
+            cmd = "exit";
+            std::cout << std::endl;
+        }
+        if (cmd.empty()) {
+            std::cout << "[Clook] > ";
+            continue;
+        } 
+        if(cmd == "quit" || cmd == "exit") break;
+        handleMainCommand(cmd);
+    }
+    std::cout << "Goodbye!\n";
+}
+
+
 void MilestoneManager::handleMainCommand(const std::string& cmd) {
     std::istringstream iss(cmd);
     std::string action;
     iss >> action;
 
+    if (action.empty()) {
+        std::cout << "[Milestone: " << getCurrentMilestoneName() << "] > ";
+        return;
+    }
+    
     // Create new milestone
     if(action == "new") {
         std::string name, desc;
@@ -46,8 +85,9 @@ void MilestoneManager::handleMainCommand(const std::string& cmd) {
         if (milestones.empty()) {
             std::cout << "No milestones yet, Start a new one!" << std::endl;
         } else {
+            std::cout << "Milestone" << std::endl;
             for (size_t i = 0; i < milestones.size(); i++){
-                std::cout << i + 1 << ". " << milestones[i]->getName();
+                std::cout << "  " << i + 1 << ". " << milestones[i]->getName();
                 if(milestones[i]->getDescription().empty()) {
                     std::cout << std::endl;
                 } else {
@@ -93,10 +133,11 @@ void MilestoneManager::handleMainCommand(const std::string& cmd) {
             Milestone& m = *milestones[selected];
             std::string subcmd;
 
-            // showMilestoneMenu(m); 
-            std::cout << "--> ";
+            std::cout << "[Milestone: " << m.getName() << "] > ";
             while (true) {
-                std::getline(std::cin , subcmd);
+                if(!std::getline(std::cin , subcmd)) {
+                    return;
+                }
                 if (subcmd == "back") break;
                 handleMilestoneCommand(m, subcmd);
             }
@@ -105,11 +146,15 @@ void MilestoneManager::handleMainCommand(const std::string& cmd) {
         }
     } else if (action == "help") {
         showMainMenu();
-    }
+    } else if (action == "clear") {
+        std::cout << "\033[2J\033[H";
+        std::cout << "[Clook] > ";
+        return;
+    } 
     else {
         std::cout << "Unknown command. \n";
     }
-    std::cout << ">>> ";
+    std::cout << "[Clook] > ";
 } 
 
 void MilestoneManager::handleMilestoneCommand(Milestone& m, const std::string& cmd) {
@@ -139,35 +184,51 @@ void MilestoneManager::handleMilestoneCommand(Milestone& m, const std::string& c
     } else if (action == "select") {
         size_t index; iss >> index;
         m.selectAttempt(index); 
-    } else if (action == "start") { 
-        m.startAttempt();
+    } else if (action == "enter") { 
+        if (!m.isAttemptSelected()) { std::cout << "Select an Attempt first" << std::endl; } 
+        else {
+            std::string subcmd;
+            while (true) {
+                std::cout << "[Attempt: " << m.getAttemptName() << "] > ";
+
+                if (!std::getline(std::cin, subcmd)) return;
+                if (subcmd.empty()) continue;
+                if (subcmd == "back") break;
+                
+                else if (subcmd == "start") {
+                    m.startAttempt();
+                } else if (subcmd == "pause") {
+                    m.pauseAttempt();
+                } else if (subcmd == "resume") {
+                    m.resumeAttempt();
+                } else if (subcmd == "stop") {
+                    m.stopAttempt();
+                } else if (subcmd == "help") {
+                    showAttemptMenu();
+                } else {
+                    std::cout << "Invalid command" << std::endl;
+                }
+            }
+        }
     } else if (action == "set") {
         int duration; iss >> duration;
         m.setSessionDuration(duration);
         std::cout << "Loop duration has been set to " << duration << " minutes." << std::endl;
     } else if (action == "help") {
         showMilestoneMenu(m);
+    } else if (action == "delete") {
+        size_t index; iss >> index;
+        m.deleteAttempt(index);
+    } else if (action.empty()) {
+
     }
     
     else {
         std::cout << "Unknown command" << std::endl;
     }
-    std::cout << "--> ";
+    std::cout << "[Milestone: " << m.getName() << "] > ";
 }
 
-
-void MilestoneManager::run() {
-    // showMainMenu(); 
-    std::cout << ">>> ";
-    running = true;
-    while (running) {
-        std::string cmd;
-        std::getline(std::cin, cmd);
-        if(cmd == "quit" || cmd == "exit") break;
-        handleMainCommand(cmd);
-    }
-    std::cout << "Goodbye!\n";
-}
 
 MilestoneManager::MilestoneManagerData MilestoneManager::serialize() const {
     MilestoneManagerData data;

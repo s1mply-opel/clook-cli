@@ -113,3 +113,28 @@ Attempt::AttemptData loadAttemptFromStream(std::ifstream &in) {
 
     return data;
 }
+
+void safeSave(const MilestoneManager::MilestoneManagerData &data, const std::string &filename) {
+    namespace fs = std::filesystem;
+
+    fs::path savePath = filename;
+    fs::path tmpPath = savePath;
+    tmpPath += ".tmp";
+    fs::path backupPath = savePath;
+    backupPath += ".bak";
+
+    try {
+        saveMilestoneManager(data, tmpPath.string());
+
+        if (fs::exists(savePath)) {
+            fs::copy_file(savePath, backupPath, fs::copy_options::overwrite_existing);
+        }
+
+        fs::rename(tmpPath, savePath);
+    } catch (const std::exception& e) {
+        std::cerr << "[Error] Failed to save data: " << e.what() << std::endl;
+
+        if (fs::exists(tmpPath)) fs::remove(tmpPath);
+    }
+
+}
