@@ -48,11 +48,49 @@ void Milestone::listAttempts() {
         cur = attempts[i].get()->getCurrent();
         trg = attempts[i].get()->getTarget();
 
-        if (desc.empty()) {
-            std::cout << "  " << i + 1 << ". " << name << " -- " << cur << " / " << trg << std::endl;
+        if (i == selected && timer->isRunning()) {
+            if (desc.empty()) {
+                std::cout << "  " << i + 1 << ". " << name << " -- " << cur << " / " << trg << " -- Running" << std::endl;
+            }
+            else {
+                std::cout << "  " << i + 1 << ". " << name << " - " << desc << " -- " << cur << " / " << trg << " -- Running" << std::endl;
+            }
         } else {
-            std::cout << "  " << i + 1 << ". " << name << " - " << desc << " -- "<< cur << " / " << trg << std::endl;
+            if (desc.empty()) {
+                std::cout << "  " << i + 1 << ". " << name << " -- " << cur << " / " << trg << std::endl;
+            }
+            else {
+                std::cout << "  " << i + 1 << ". " << name << " - " << desc << " -- " << cur << " / " << trg << std::endl;
+            }
         }
+    }
+}
+
+void Milestone::setMilestoneName(std::string newName) {
+    name = newName;
+}
+
+void Milestone::setAttemptName(std::string newName) {
+    if (isAttemptSelected()) {
+        activeAttempt->setName(newName);
+    } else {
+        std::cout << "Select an attempt first!" << std::endl;
+    }
+}
+
+void Milestone::setAttemptDesc(std::string newDesc) {
+    if (isAttemptSelected()) {
+        activeAttempt->setDescription(newDesc);
+    } else {
+        std::cout << "Select an attempt first!" << std::endl;
+    }
+}
+
+void Milestone::setAttemptTarget(int t) {
+    if (isAttemptSelected()) {
+        activeAttempt->setTarget(t);
+    } else {
+        std::cout << "Select an attempt first!" << std::endl;
     }
 }
 

@@ -37,3 +37,19 @@ set_target_properties(${PROJECT_NAME} ${PROJECT_NAME}_tests clook_lib
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
 )
+
+# --- Debug Executable ---
+add_executable(clook-cli-debug main.cpp)
+target_link_libraries(clook-cli-debug PRIVATE clook_lib)
+
+# output to bin/
+set_target_properties(clook-cli-debug
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
+)
+
+# --- make debug ---
+add_custom_target(debug
+    COMMAND ${CMAKE_COMMAND} --build . --target clook-cli-debug
+    COMMENT "Building debug version: clook-cli-debug"
+)

@@ -3,10 +3,11 @@
 void MilestoneManager::showMainMenu() const {
     std::cout << "=== Clook: Main Menu ===\n";
     std::cout << "Commands:\n"
-              << "  new <name> <desc>     - Create new milestone\n"
+              << "  add <name> <desc>     - Create new milestone\n"
               << "  list                  - List all milestones\n"
               << "  delete <index>        - Delete milestone\n"
               << "  select <index>        - Manage milestone\n"
+              << "  rename <new_name>     - Rename milestone\n"
               << "  enter                 - Enter milestone\n"
               << "  help                  - Show commands\n"
               << "  clear                 - Clear screen\n"
@@ -16,15 +17,18 @@ void MilestoneManager::showMainMenu() const {
 void MilestoneManager::showMilestoneMenu(Milestone& m) const {
     std::cout << "=== Milestone: " << m.getName() << " ===\n";
     std::cout << "Commands:\n"
-              << "  info                  - Show milestone details\n"
-              << "  add <name> <desc> <t> - Add a new attempt\n"
-              << "  list                  - List all attempts\n"
-              << "  enter                 - Enter attempt menu\n"
-              << "  delete <index>        - Delete attempt by index\n"
-              << "  select <index>        - Select and manage a specific attempt\n"
-              << "  set <minutes>         - Set duration time per loop\n"
-              << "  help                  - Show commands\n"
-              << "  back                  - Return to main menu\n";
+              << "  info                                - Show milestone details\n"
+              << "  add <name> <desc> <t>               - Add a new attempt\n"
+              << "  list                                - List all attempts\n"
+              << "  enter                               - Enter attempt menu\n"
+              << "  delete <index>                      - Delete attempt by index\n"
+              << "  select <index>                      - Select and manage a specific attempt\n"
+              << "  setname <new_name>                  - Rename attempt\n"
+              << "  setdesc <new_desc>                  - Rename attempt description\n"
+              << "  settarget <new_target>              - Set new target\n"
+              << "  set <minutes>                       - Set duration time per loop\n"
+              << "  help                                - Show commands\n"
+              << "  back                                - Return to main menu\n";
 }
 
 void MilestoneManager::showAttemptMenu() const {
@@ -70,7 +74,7 @@ void MilestoneManager::handleMainCommand(const std::string& cmd) {
     }
     
     // Create new milestone
-    if(action == "new") {
+    if(action == "add") {
         std::string name, desc;
         iss >> std::quoted(name) >> std::quoted(desc);
         
@@ -127,6 +131,15 @@ void MilestoneManager::handleMainCommand(const std::string& cmd) {
             std::cout << "Milestone: " << milestones[selected].get()->getName() << " selected" << std::endl;
         } else {
             std::cout << "Invalid index." << std::endl;
+        }
+    } else if (action == "rename") {
+        std::string new_name;
+        iss >> std::quoted(new_name);
+        if (selected < milestones.size()) {
+            milestones[selected].get()->setMilestoneName(new_name);
+            std::cout << "Name changed to: " << milestones[selected].get()->getName() << std::endl;
+        } else {
+            std::cout << "Select an milestone first" << std::endl;
         }
     } else if (action == "enter") {
         if (selected < milestones.size() && selected >= 0) {
@@ -221,6 +234,15 @@ void MilestoneManager::handleMilestoneCommand(Milestone& m, const std::string& c
         m.deleteAttempt(index);
     } else if (action.empty()) {
 
+    } else if (action == "setname") {
+        std::string name; iss >> name;
+        m.setAttemptName(name);
+    } else if (action == "setdesc") {
+        std::string desc; iss >> desc;
+        m.setAttemptDesc(desc);
+    } else if (action == "settarget") {
+        int t; iss >> t;
+        m.setAttemptTarget(t);
     }
     
     else {

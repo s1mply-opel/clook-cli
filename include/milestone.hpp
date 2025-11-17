@@ -36,7 +36,6 @@ public:
     const std::string& getName() const noexcept { return name; }
     const std::string& getDescription() const noexcept { return description; }
     const int getDuration() const noexcept { return loopDuration; }
-
     const std::string getAttemptName() const noexcept {
         if (selected < attempts.size()) {
             return attempts[selected].get()->getName();
@@ -44,6 +43,11 @@ public:
             return std::string("NULL");
         }
     }
+
+    void setMilestoneName(std::string newName);
+    void setAttemptName(std::string newName);
+    void setAttemptDesc(std::string newDesc);
+    void setAttemptTarget(int);
 
     const bool isAttemptSelected() const noexcept { return (selected < attempts.size()); }
 
