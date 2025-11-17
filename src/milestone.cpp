@@ -41,7 +41,18 @@ void Milestone::listAttempts() {
 
     std::cout << "Attempts" << std::endl;
     for (size_t i = 0;i < attempts.size(); i++) {
-        std::cout << "  " << i + 1 << ". " << attempts[i].get()->getName() << " - " << attempts[i].get()->getDescription() << " -- "<< attempts[i].get()->getCurrent() << " / " << attempts[i].get()->getTarget() << std::endl;
+        std::string name, desc;
+        int cur, trg;
+        name = attempts[i].get()->getName();
+        desc = attempts[i].get()->getDescription();
+        cur = attempts[i].get()->getCurrent();
+        trg = attempts[i].get()->getTarget();
+
+        if (desc.empty()) {
+            std::cout << "  " << i + 1 << ". " << name << " -- " << cur << " / " << trg << std::endl;
+        } else {
+            std::cout << "  " << i + 1 << ". " << name << " - " << desc << " -- "<< cur << " / " << trg << std::endl;
+        }
     }
 }
 
